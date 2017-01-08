@@ -23,14 +23,15 @@ fn show() {
     for transactions in data.as_array() {
         for txn in transactions {
             //println!("{:?}", txn);
-            let received_time = NaiveDateTime::from_timestamp(txn.find("timereceived").unwrap().as_i64().unwrap(), 0);
-            println!("  {} {:.8} to {:.5} at {}",
-                txn.find("category").unwrap().as_str().unwrap(),
+            let received_time = NaiveDateTime::from_timestamp(txn.find("blocktime").unwrap().as_i64().unwrap(), 0);
+            println!("  {}    {:.8} ZEC    (to {:.7} in txn {:.7})",
+                received_time.format("%b %d %H:%M:%S"),
                 txn.find("amount").unwrap().as_f64().unwrap(),
                 txn.find("address").unwrap().as_str().unwrap(),
-                received_time.format("%b %d %H:%M:%S"));
+                txn.find("txid").unwrap().as_str().unwrap()
+            );
         }
     }
 
-    println!("\nBalance:\n  {} ZEC", balance);
+    println!("\nConfirmed Balance:\n  {} ZEC", balance);
 }
