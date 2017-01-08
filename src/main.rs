@@ -10,10 +10,12 @@ fn main() {
     show();
 }
 
-
 fn show() {
     let output = Command::new("zcash-cli").arg("getbalance").output().expect("failed to execute zcash-cli").stdout;
     let balance = std::str::from_utf8(&output).unwrap().trim().parse::<f32>().expect("parsing balace as float");
+
+    let output = Command::new("zcash-cli").arg("getunconfirmedbalance").output().expect("failed to execute zcash-cli").stdout;
+    let unconfirmed_balance = std::str::from_utf8(&output).unwrap().trim().parse::<f32>().expect("parsing unc-balace as float");
 
     let output = Command::new("zcash-cli").arg("listtransactions").output().expect("failed to execute zcash-cli").stdout;
     let data: Value = serde_json::from_str(std::str::from_utf8(&output).unwrap()).unwrap();
@@ -33,5 +35,9 @@ fn show() {
         }
     }
 
-    println!("\nConfirmed Balance:\n  {} ZEC", balance);
+    println!("\nConfirmed Balance:   {:.8} ZEC", balance);
+    if unconfirmed_balance > 0.0 {
+        println!("\nUnconfirmed Balance: {:.8} ZEC", unconfirmed_balance);
+        println!("Total Balance:       {:.8} ZEC", balance + unconfirmed_balance);
+    }
 }
