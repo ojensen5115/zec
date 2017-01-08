@@ -10,24 +10,22 @@ fn main() {
     show();
 }
 
-fn show() {
+fn show() -> bool {
     // we only bother with the error checking the first time, because if it's up it's up
     let balance = match Command::new("zcash-cli").arg("getbalance").output() {
         Ok(out) => {
             let stdout = String::from_utf8(out.stdout).expect("stdout not UTF8");
             if stdout != "" {
-                let x = stdout.trim().parse::<f32>().unwrap();
-                println!("{:?}", x);
-                x
+                stdout.trim().parse::<f32>().unwrap()
             } else {
                 // zcashd not ready yet
                 println!("{}", String::from_utf8(out.stderr).expect("stderr not UTF8"));
-                return;
+                return false;
             }
         },
         Err(e) => {
             println!("Failed to run zcash-cli: {}", e);
-            return;
+            return false;
         }
     };
 
@@ -59,4 +57,5 @@ fn show() {
         println!("\nUnconfirmed Balance: {:.8} ZEC", unconfirmed_balance);
         println!("Total Balance:       {:.8} ZEC", balance + unconfirmed_balance);
     }
+    return true;
 }
