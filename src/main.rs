@@ -25,9 +25,12 @@ fn show() {
     for transactions in data.as_array() {
         for txn in transactions {
             //println!("{:?}", txn);
-            let received_time = NaiveDateTime::from_timestamp(txn.find("blocktime").unwrap().as_i64().unwrap(), 0);
+            let received_time = match txn.find("blocktime") {
+                Some(string) => NaiveDateTime::from_timestamp(string.as_i64().unwrap(), 0).format("%b %d %H:%M:%S").to_string(),
+                None => "---------------".to_string()
+            };
             println!("  {}    {:.8} ZEC    (to {:.7} in txn {:.7})",
-                received_time.format("%b %d %H:%M:%S"),
+                received_time,
                 txn.find("amount").unwrap().as_f64().unwrap(),
                 txn.find("address").unwrap().as_str().unwrap(),
                 txn.find("txid").unwrap().as_str().unwrap()
