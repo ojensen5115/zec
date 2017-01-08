@@ -11,15 +11,31 @@ fn main() {
 }
 
 fn show() {
-    let output = Command::new("zcash-cli").arg("getbalance").output().expect("failed to execute zcash-cli").stdout;
-    let balance = std::str::from_utf8(&output).unwrap().trim().parse::<f32>().expect("parsing balace as float");
+    // we only bother with the error checking the first time, because if it's up it's up
+    let balance = match Command::new("zcash-cli").arg("getbalance").output() {
+        Ok(out) => {
+            let stdout = String::from_utf8(out.stdout).expect("stdout not UTF8");
+            if stdout != "" {
+                let x = stdout.trim().parse::<f32>().unwrap();
+                println!("{:?}", x);
+                x
+            } else {
+                // zcashd not ready yet
+                println!("{}", String::from_utf8(out.stderr).expect("stderr not UTF8"));
+                return;
+            }
+        },
+        Err(e) => {
+            println!("Failed to run zcash-cli: {}", e);
+            return;
+        }
+    };
 
     let output = Command::new("zcash-cli").arg("getunconfirmedbalance").output().expect("failed to execute zcash-cli").stdout;
     let unconfirmed_balance = std::str::from_utf8(&output).unwrap().trim().parse::<f32>().expect("parsing unc-balace as float");
 
     let output = Command::new("zcash-cli").arg("listtransactions").output().expect("failed to execute zcash-cli").stdout;
     let data: Value = serde_json::from_str(std::str::from_utf8(&output).unwrap()).unwrap();
-
 
     println!("Recent Transactions:");
     for transactions in data.as_array() {
