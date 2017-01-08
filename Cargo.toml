@@ -1,0 +1,8 @@
+[package]
+name = "zec"
+version = "0.1.0"
+authors = ["Oliver Jensen <ojensen5115@gmail.com>"]
+
+[dependencies]
+chrono = "0.2"
+serde_json = "0.8"
