@@ -2,6 +2,8 @@ extern crate chrono;
 extern crate serde_json;
 
 use chrono::NaiveDateTime;
+use chrono::DateTime;
+use chrono::{UTC,Local};
 use serde_json::Value;
 use std::process::Command;
 
@@ -40,9 +42,14 @@ fn show() -> bool {
         for txn in transactions {
             //println!("{:?}", txn);
             let received_time = match txn.find("blocktime") {
-                Some(string) => NaiveDateTime::from_timestamp(string.as_i64().unwrap(), 0).format("%b %d %H:%M:%S").to_string(),
+                Some(string) => {
+                    let ts = string.as_i64().unwrap();
+                    let utc = DateTime::<UTC>::from_utc(NaiveDateTime::from_timestamp(ts, 0), UTC);
+                    utc.with_timezone(&Local).format("%b %d %H:%M:%S").to_string()
+                },
                 None => "---------------".to_string()
             };
+            //let received_time = DateTime::from_utc(received_time_utc, )
             println!("  {}    {:.8} ZEC    (to {:.7} in txn {:.7})",
                 received_time,
                 txn.find("amount").unwrap().as_f64().unwrap(),
