@@ -40,7 +40,6 @@ fn show() -> bool {
     println!("Recent Transactions:");
     for transactions in data.as_array() {
         for txn in transactions {
-            //println!("{:?}", txn);
             let received_time = match txn.find("blocktime") {
                 Some(string) => {
                     let ts = string.as_i64().unwrap();
@@ -49,7 +48,6 @@ fn show() -> bool {
                 },
                 None => "---------------".to_string()
             };
-            //let received_time = DateTime::from_utc(received_time_utc, )
             println!("  {}    {:.8} ZEC    (to {:.7} in txn {:.7})",
                 received_time,
                 txn.find("amount").unwrap().as_f64().unwrap(),
